@@ -1,0 +1,6 @@
+name;value
+sso.duration;30
+sso.iterations;1000
+sso.digest;SHA-1
+sso.secret;secret
+sso.crypt;DESede
