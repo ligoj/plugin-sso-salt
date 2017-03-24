@@ -56,7 +56,7 @@ public class SaltedAuthenticationResource {
 	private static final int DEFAULT_TIMEOUT = 30;
 
 	/**
-	 * SSO digest algorithm used for password.
+	 * Default SSO digest algorithm used for password.
 	 */
 	private static final String DEFAULT_DIGEST = "SHA-1";
 
@@ -149,6 +149,13 @@ public class SaltedAuthenticationResource {
 	}
 
 	/**
+	 * SSO digest algorithm used for password.
+	 */
+	private String getDigest() {
+		return get("sso.digest", DEFAULT_DIGEST);
+	}
+
+	/**
 	 * Return SSO token to use in cross site parameters valid for 30 minutes.
 	 * 
 	 * @param login
@@ -172,9 +179,9 @@ public class SaltedAuthenticationResource {
 	 *            The secret key.
 	 * @return the original message.
 	 */
-	protected String encrypt(final String message, final String secretKey) throws Exception {
+	protected String encrypt(final String message, final String secretKey) throws Exception { // NOSONAR
 		// SSO digest algorithm used for password. This
-		final MessageDigest md = MessageDigest.getInstance(get("sso.digest", DEFAULT_DIGEST));
+		final MessageDigest md = MessageDigest.getInstance(getDigest());
 		final byte[] digestOfPassword = md.digest(secretKey.getBytes(StandardCharsets.UTF_8));
 		final byte[] keyBytes = Arrays.copyOf(digestOfPassword, 24);
 
@@ -199,9 +206,9 @@ public class SaltedAuthenticationResource {
 	 *            The secret key.
 	 * @return the original message.
 	 */
-	private String decrypt(final String encryptedMessage, final String secretKey) throws Exception {
+	private String decrypt(final String encryptedMessage, final String secretKey) throws Exception { // NOSONAR
 		final byte[] message = Base64.decodeBase64(encryptedMessage.getBytes(StandardCharsets.UTF_8));
-		final MessageDigest md = MessageDigest.getInstance(get("sso.digest", DEFAULT_DIGEST));
+		final MessageDigest md = MessageDigest.getInstance(getDigest());
 		final byte[] digestOfPassword = md.digest(secretKey.getBytes(StandardCharsets.UTF_8));
 		final byte[] keyBytes = Arrays.copyOf(digestOfPassword, 24);
 		final String algo = get("sso.crypt", DEFAULT_IMPL);
@@ -228,7 +235,7 @@ public class SaltedAuthenticationResource {
 	 */
 	protected byte[] getHash(final int iterations, final String password, final byte[] salt)
 			throws NoSuchAlgorithmException {
-		final MessageDigest digest = MessageDigest.getInstance(get("sso.digest", DEFAULT_DIGEST));
+		final MessageDigest digest = MessageDigest.getInstance(getDigest());
 		digest.reset();
 		digest.update(salt);
 		byte[] input = digest.digest(password.getBytes(StandardCharsets.UTF_8));
