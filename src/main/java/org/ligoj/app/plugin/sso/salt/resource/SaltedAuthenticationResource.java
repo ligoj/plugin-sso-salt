@@ -21,6 +21,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.ligoj.app.api.FeaturePlugin;
 import org.ligoj.app.iam.IamProvider;
 import org.ligoj.bootstrap.resource.system.configuration.ConfigurationResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Transactional
 @Produces(MediaType.APPLICATION_JSON)
-public class SaltedAuthenticationResource {
+public class SaltedAuthenticationResource implements FeaturePlugin {
 
 	/**
 	 * Amount of digest iterations applied to original message to produce the
@@ -305,5 +306,10 @@ public class SaltedAuthenticationResource {
 	 */
 	private String getUserKey(final String login) {
 		return iamProvider.getConfiguration().getUserRepository().getToken(login);
+	}
+
+	@Override
+	public String getKey() {
+		return "feature:sso:salt";
 	}
 }
