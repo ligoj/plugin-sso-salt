@@ -123,4 +123,8 @@ public class SaltedAuthenticationResourceTest extends AbstractAppTest {
 				+ new String(Base64.encodeInteger(new BigInteger(String.valueOf(expire)))), "secret");
 	}
 
+	@Test
+	public void getKey() {
+		Assert.assertEquals("feature:sso:salt", resource.getKey());
+	}
 }
