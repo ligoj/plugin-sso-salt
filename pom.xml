@@ -9,7 +9,7 @@
 
 	<groupId>org.ligoj.plugin</groupId>
 	<artifactId>plugin-sso-salt</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Ligoj - Plugin SSO Salt</name>
 	<description>Plugin to enable an authentication from a link containg security access token.</description>
