@@ -44,9 +44,9 @@ public class SaltedAuthenticationResourceTest extends AbstractAppTest {
 
 		resource = new SaltedAuthenticationResource();
 		applicationContext.getAutowireCapableBeanFactory().autowireBean(resource);
-		resource.iamProvider = Mockito.mock(IamProvider.class);
+		resource.iamProvider = new IamProvider[] { Mockito.mock(IamProvider.class) };
 		final IamConfiguration configuration = Mockito.mock(IamConfiguration.class);
-		Mockito.when(resource.iamProvider.getConfiguration()).thenReturn(configuration);
+		Mockito.when(resource.iamProvider[0].getConfiguration()).thenReturn(configuration);
 		userRepository = Mockito.mock(IUserRepository.class);
 		Mockito.when(configuration.getUserRepository()).thenReturn(userRepository);
 	}

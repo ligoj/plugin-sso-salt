@@ -62,7 +62,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	private static final String DEFAULT_DIGEST = "SHA-1";
 
 	@Autowired
-	protected IamProvider iamProvider;
+	protected IamProvider[] iamProvider;
 
 	@Autowired
 	private ConfigurationResource configuration;
@@ -305,7 +305,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	 * not) from LDAP, will be hashed to build the final key.
 	 */
 	private String getUserKey(final String login) {
-		return iamProvider.getConfiguration().getUserRepository().getToken(login);
+		return iamProvider[0].getConfiguration().getUserRepository().getToken(login);
 	}
 
 	@Override
