@@ -98,7 +98,7 @@ public class SaltedAuthenticationResourceTest extends AbstractAppTest {
 	}
 
 	@Test
-	public void testNotExist() throws Exception {
+	public void testNotExist() {
 		Mockito.when(userRepository.getToken("jdoe4")).thenReturn(null);
 		Assertions.assertThrows(AccessDeniedException.class, () -> {
 			resource.checkSsoToken(null);
