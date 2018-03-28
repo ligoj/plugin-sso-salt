@@ -85,7 +85,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 		final String ssoKey = get("sso.secret", "secret");
 		try {
 			fields = StringUtils.split(StringUtils.trimToEmpty(decrypt(token, ssoKey)), "|");
-		} catch (@SuppressWarnings("unused") final Exception e) { // NOSONAR - avoid log pollution for this
+		} catch (final Exception e) { // NOSONAR - avoid log pollution for this
 			// TIME RESISTANT ATTACK
 			log.warn("Bad SSO attack attempt with token '{}'", token);
 		}
