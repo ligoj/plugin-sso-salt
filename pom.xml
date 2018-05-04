@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.ligoj.api</groupId>
 		<artifactId>plugin-parent</artifactId>
-		<version>2.2.5</version>
+		<version>2.3.0</version>
 		<relativePath/>
 	</parent>
 
@@ -13,6 +13,10 @@
 	<packaging>jar</packaging>
 	<name>Ligoj - Plugin SSO Salt</name>
 	<description>Plugin to enable an authentication from a link containg security access token.</description>
+
+	<properties>
+		<sonar.sources>src/main/java</sonar.sources>
+	</properties>
 
 	<dependencies>
 		<dependency>
