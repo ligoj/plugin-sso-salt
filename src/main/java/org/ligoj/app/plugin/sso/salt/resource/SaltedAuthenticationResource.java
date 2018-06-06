@@ -17,6 +17,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -71,14 +72,14 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	 * Authenticates the user with a given login and password If password and/or
 	 * login is null then always returns false. If the user does not exist in
 	 * the database returns false.
-	 * 
+	 *
 	 * @param token
 	 *            SSO token to validate.
 	 * @return the associated trusted user name or null.
 	 */
 	@POST
 	public String checkSsoToken(final String token) throws NoSuchAlgorithmException {
-		String[] fields = new String[0];
+		String[] fields = ArrayUtils.EMPTY_STRING_ARRAY;
 		boolean userExist = true;
 
 		// Secret key of DES algorithm used to generated the SSO token.
@@ -125,7 +126,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 
 	/**
 	 * Return the configuration integer value.
-	 * 
+	 *
 	 * @param key
 	 *            The configuration key name.
 	 * @param defaultValue
@@ -138,7 +139,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 
 	/**
 	 * Return the configuration integer value.
-	 * 
+	 *
 	 * @param key
 	 *            The configuration key name.
 	 * @param defaultValue
@@ -158,7 +159,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 
 	/**
 	 * Return SSO token to use in cross site parameters valid for 30 minutes.
-	 * 
+	 *
 	 * @param login
 	 *            String The login of the user
 	 * @return SSO token to use in cross site parameters.
@@ -173,7 +174,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 
 	/**
 	 * Encrypt the message with the given key.
-	 * 
+	 *
 	 * @param message
 	 *            Ciphered message.
 	 * @param secretKey
@@ -200,7 +201,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 
 	/**
 	 * Decrypt the message with the given key.
-	 * 
+	 *
 	 * @param encryptedMessage
 	 *            Encrypted message.
 	 * @param secretKey
@@ -223,7 +224,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	/**
 	 * From a password, a number of iterations and a salt, returns the
 	 * corresponding digest
-	 * 
+	 *
 	 * @param iterations
 	 *            The amount of iterations of the algorithm.
 	 * @param password
@@ -249,7 +250,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 
 	/**
 	 * From a base 64 representation, returns the corresponding byte[]
-	 * 
+	 *
 	 * @param data
 	 *            String The base64 representation
 	 * @return byte[]
@@ -260,7 +261,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 
 	/**
 	 * From a byte[] returns a base 64 representation
-	 * 
+	 *
 	 * @param data
 	 *            byte[]
 	 * @return String
@@ -271,7 +272,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 
 	/**
 	 * Return SSO token to use in cross site parameters valid for few minutes.
-	 * 
+	 *
 	 * @param login
 	 *            The login of the user.
 	 * @param userKey
