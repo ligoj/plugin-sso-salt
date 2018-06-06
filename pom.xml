@@ -14,6 +14,12 @@
 	<name>Ligoj - Plugin SSO Salt</name>
 	<description>Plugin to enable an authentication from a link containg security access token.</description>
 
+	<scm>
+		<connection>scm:git:https://github.com/ligoj/plugin-sso-salt</connection>
+		<developerConnection>scm:git:https://github.com/ligoj/plugin-sso-sa</developerConnection>
+		<url>https://github.com/ligoj/plugin-sso-sa.git</url>
+	</scm>
+
 	<properties>
 		<sonar.sources>src/main/java</sonar.sources>
 	</properties>
