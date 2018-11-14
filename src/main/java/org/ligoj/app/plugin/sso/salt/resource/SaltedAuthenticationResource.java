@@ -2,6 +2,7 @@ package org.ligoj.app.plugin.sso.salt.resource;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -74,9 +75,11 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	 * @param token
 	 *            SSO token to validate.
 	 * @return the associated trusted user name or null.
+	 * @throws GeneralSecurityException
+	 *             When configured digest is not available.
 	 */
 	@POST
-	public String checkSsoToken(final String token) throws NoSuchAlgorithmException {
+	public String checkSsoToken(final String token) throws GeneralSecurityException {
 		String[] fields = ArrayUtils.EMPTY_STRING_ARRAY;
 		boolean userExist = true;
 
@@ -160,8 +163,10 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	 * @param login
 	 *            String The login of the user
 	 * @return SSO token to use in cross site parameters.
+	 * @throws NoSuchAlgorithmException
+	 *             When configured digest is not available.
 	 */
-	public String getSsoToken(final String login) throws Exception {
+	public String getSsoToken(final String login) throws GeneralSecurityException {
 		final String userKey = getUserKey(login);
 		if (userKey == null) {
 			return null;
@@ -177,8 +182,10 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	 * @param secretKey
 	 *            The secret key.
 	 * @return the original message.
+	 * @throws GeneralSecurityException
+	 *             When encryption can not be performed.
 	 */
-	protected String encrypt(final String message, final String secretKey) throws Exception { // NOSONAR
+	protected String encrypt(final String message, final String secretKey) throws GeneralSecurityException {
 		// SSO digest algorithm used for password. This
 		final MessageDigest md = MessageDigest.getInstance(getDigest());
 		final byte[] digestOfPassword = md.digest(secretKey.getBytes(StandardCharsets.UTF_8));
@@ -274,8 +281,10 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	 * @param userKey
 	 *            The key of the user.
 	 * @return SSO token to use as cross site parameter.
+	 * @throws GeneralSecurityException
+	 *             When digest failed.
 	 */
-	private String getSsoToken(final String login, final String userKey) throws Exception {
+	private String getSsoToken(final String login, final String userKey) throws GeneralSecurityException {
 		// Uses a secure Random not a simple Random
 		final SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
 		// Salt generation 64 bits long
