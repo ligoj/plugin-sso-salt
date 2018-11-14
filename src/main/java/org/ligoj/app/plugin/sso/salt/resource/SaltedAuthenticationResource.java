@@ -22,8 +22,8 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.ligoj.app.api.FeaturePlugin;
 import org.ligoj.app.iam.IamProvider;
+import org.ligoj.bootstrap.core.plugin.FeaturePlugin;
 import org.ligoj.bootstrap.resource.system.configuration.ConfigurationResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -42,8 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SaltedAuthenticationResource implements FeaturePlugin {
 
 	/**
-	 * Amount of digest iterations applied to original message to produce the
-	 * target hash.
+	 * Amount of digest iterations applied to original message to produce the target hash.
 	 */
 	private static final int DEFAULT_ITERATION = 1000;
 
@@ -69,9 +68,8 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	private ConfigurationResource configuration;
 
 	/**
-	 * Authenticates the user with a given login and password If password and/or
-	 * login is null then always returns false. If the user does not exist in
-	 * the database returns false.
+	 * Authenticates the user with a given login and password If password and/or login is null then always returns
+	 * false. If the user does not exist in the database returns false.
 	 *
 	 * @param token
 	 *            SSO token to validate.
@@ -103,8 +101,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 		String userKey = getUserKey(login);
 		if (userKey == null || expire < System.currentTimeMillis()) {
 			// TIME RESISTANT ATTACK
-			// Computation time is equal to the time needed for a legitimate
-			// user
+			// Computation time is equal to the time needed for a legitimate user
 			userExist = false;
 			userKey = "0";
 		}
@@ -222,8 +219,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	}
 
 	/**
-	 * From a password, a number of iterations and a salt, returns the
-	 * corresponding digest
+	 * From a password, a number of iterations and a salt, returns the corresponding digest
 	 *
 	 * @param iterations
 	 *            The amount of iterations of the algorithm.
@@ -294,16 +290,14 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 		// Secret key of DES algorithm used to generated the SSO token.
 		final String ssoKey = configuration.get("sso.secret");
 		// Generated an encrypted key, valid for 30 minutes
-		return encrypt(
-				login + "|"
-						+ sDigest + "|" + sSalt + "|" + new String(
-								Base64.encodeInteger(new BigInteger(String.valueOf(expire))), StandardCharsets.UTF_8),
+		return encrypt(login + "|" + sDigest + "|" + sSalt + "|"
+				+ new String(Base64.encodeInteger(new BigInteger(String.valueOf(expire))), StandardCharsets.UTF_8),
 				ssoKey);
 	}
 
 	/**
-	 * Return the key used to compare for a given login. The password (salted or
-	 * not) from LDAP, will be hashed to build the final key.
+	 * Return the key used to compare for a given login. The password (salted or not) from LDAP, will be hashed to build
+	 * the final key.
 	 */
 	private String getUserKey(final String login) {
 		return iamProvider[0].getConfiguration().getUserRepository().getToken(login);
