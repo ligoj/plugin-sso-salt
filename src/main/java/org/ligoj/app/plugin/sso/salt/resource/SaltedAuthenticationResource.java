@@ -175,6 +175,37 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	}
 
 	/**
+	 * Return SSO token to use in cross site parameters valid for few minutes.
+	 *
+	 * @param login
+	 *            The login of the user.
+	 * @param userKey
+	 *            The key of the user.
+	 * @return SSO token to use as cross site parameter.
+	 * @throws GeneralSecurityException
+	 *             When digest failed.
+	 */
+	private String getSsoToken(final String login, final String userKey) throws GeneralSecurityException {
+		// Uses a secure Random not a simple Random
+		final SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+		// Salt generation 64 bits long
+		final byte[] bSalt = new byte[8];
+		random.nextBytes(bSalt);
+		// Digest computation
+		final long expire = System.currentTimeMillis()
+				+ DateUtils.MILLIS_PER_MINUTE * get("sso.duration", DEFAULT_TIMEOUT);
+		final byte[] bDigest = getHash(get("sso.iteration", 1000), login + userKey + expire, bSalt);
+		final String sDigest = byteToBase64(bDigest);
+		final String sSalt = byteToBase64(bSalt);
+		// Secret key of DES algorithm used to generated the SSO token.
+		final String ssoKey = configuration.get("sso.secret");
+		// Generated an encrypted key, valid for 30 minutes
+		return encrypt(login + "|" + sDigest + "|" + sSalt + "|"
+				+ new String(Base64.encodeInteger(new BigInteger(String.valueOf(expire))), StandardCharsets.UTF_8),
+				ssoKey);
+	}
+
+	/**
 	 * Encrypt the message with the given key.
 	 *
 	 * @param message
@@ -271,37 +302,6 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	 */
 	protected String byteToBase64(final byte[] data) {
 		return Base64.encodeBase64String(data);
-	}
-
-	/**
-	 * Return SSO token to use in cross site parameters valid for few minutes.
-	 *
-	 * @param login
-	 *            The login of the user.
-	 * @param userKey
-	 *            The key of the user.
-	 * @return SSO token to use as cross site parameter.
-	 * @throws GeneralSecurityException
-	 *             When digest failed.
-	 */
-	private String getSsoToken(final String login, final String userKey) throws GeneralSecurityException {
-		// Uses a secure Random not a simple Random
-		final SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-		// Salt generation 64 bits long
-		final byte[] bSalt = new byte[8];
-		random.nextBytes(bSalt);
-		// Digest computation
-		final long expire = System.currentTimeMillis()
-				+ DateUtils.MILLIS_PER_MINUTE * get("sso.duration", DEFAULT_TIMEOUT);
-		final byte[] bDigest = getHash(get("sso.iteration", 1000), login + userKey + expire, bSalt);
-		final String sDigest = byteToBase64(bDigest);
-		final String sSalt = byteToBase64(bSalt);
-		// Secret key of DES algorithm used to generated the SSO token.
-		final String ssoKey = configuration.get("sso.secret");
-		// Generated an encrypted key, valid for 30 minutes
-		return encrypt(login + "|" + sDigest + "|" + sSalt + "|"
-				+ new String(Base64.encodeInteger(new BigInteger(String.valueOf(expire))), StandardCharsets.UTF_8),
-				ssoKey);
 	}
 
 	/**
