@@ -1,3 +1,6 @@
+/*
+ * Licensed under MIT (https://github.com/ligoj/ligoj/blob/master/LICENSE)
+ */
 package org.ligoj.app.plugin.sso.salt.resource;
 
 import java.io.IOException;
@@ -33,13 +36,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(locations = "classpath:/META-INF/spring/application-context-test.xml")
 @Transactional
 @Rollback
-public class SaltedAuthenticationResourceTest extends AbstractAppTest {
+class SaltedAuthenticationResourceTest extends AbstractAppTest {
 
 	private SaltedAuthenticationResource resource;
 	private IUserRepository userRepository;
 
 	@BeforeEach
-	public void prepareData() throws IOException {
+	void prepareData() throws IOException {
 		// Only with Spring context
 		persistEntities("csv", new Class[] { SystemConfiguration.class }, StandardCharsets.UTF_8.name());
 
@@ -53,13 +56,13 @@ public class SaltedAuthenticationResourceTest extends AbstractAppTest {
 	}
 
 	@Test
-	public void testGetToken() throws GeneralSecurityException {
+	void testGetToken() throws GeneralSecurityException {
 		Mockito.when(userRepository.getToken("jdupont")).thenReturn("pwd");
 		Assertions.assertNotNull(StringUtils.trimToNull(resource.getSsoToken("jdupont")));
 	}
 
 	@Test
-	public void testGetTokenFromUser() throws GeneralSecurityException {
+	void testGetTokenFromUser() throws GeneralSecurityException {
 		Mockito.when(userRepository.getToken("any")).thenReturn(null);
 		Mockito.when(userRepository.getToken(null)).thenReturn(null);
 		Assertions.assertNull(resource.getSsoToken("any"));
@@ -67,7 +70,7 @@ public class SaltedAuthenticationResourceTest extends AbstractAppTest {
 	}
 
 	@Test
-	public void testCheckEmptyToken() throws Exception {
+	void testCheckEmptyToken() throws Exception {
 		Assertions.assertNull(resource.checkSsoToken(null));
 		Assertions.assertThrows(AccessDeniedException.class, () -> {
 			Assertions.assertNull(resource.checkSsoToken(""));
@@ -75,13 +78,13 @@ public class SaltedAuthenticationResourceTest extends AbstractAppTest {
 	}
 
 	@Test
-	public void testValidToken() throws GeneralSecurityException {
+	void testValidToken() throws GeneralSecurityException {
 		Mockito.when(userRepository.getToken("jdupont")).thenReturn("pwd");
 		Assertions.assertEquals("jdupont", resource.checkSsoToken(resource.getSsoToken("jdupont")));
 	}
 
 	@Test
-	public void checkSsoTokenPasswordChanged() throws GeneralSecurityException {
+	void checkSsoTokenPasswordChanged() throws GeneralSecurityException {
 		Mockito.when(userRepository.getToken("hdurant")).thenReturn("old-pwd", "new-pwd");
 		final String token = resource.getSsoToken("hdurant");
 		Assertions.assertThrows(AccessDeniedException.class, () -> {
@@ -90,7 +93,7 @@ public class SaltedAuthenticationResourceTest extends AbstractAppTest {
 	}
 
 	@Test
-	public void checkSsoTokenTooOldToken() throws GeneralSecurityException {
+	void checkSsoTokenTooOldToken() throws GeneralSecurityException {
 		Mockito.when(userRepository.getToken("mmartin")).thenReturn("pwd");
 		final String token = getOldSsoToken("mmartin", "pwd");
 		Assertions.assertThrows(AccessDeniedException.class, () -> {
@@ -99,7 +102,7 @@ public class SaltedAuthenticationResourceTest extends AbstractAppTest {
 	}
 
 	@Test
-	public void testNotExist() {
+	void testNotExist() {
 		Mockito.when(userRepository.getToken("jdoe4")).thenReturn(null);
 		Assertions.assertThrows(AccessDeniedException.class, () -> {
 			resource.checkSsoToken(null);
@@ -133,7 +136,7 @@ public class SaltedAuthenticationResourceTest extends AbstractAppTest {
 	}
 
 	@Test
-	public void getKey() {
+	void getKey() {
 		Assertions.assertEquals("feature:sso:salt", resource.getKey());
 	}
 }

@@ -1,3 +1,6 @@
+/*
+ * Licensed under MIT (https://github.com/ligoj/ligoj/blob/master/LICENSE)
+ */
 package org.ligoj.app.plugin.sso.salt.resource;
 
 import java.math.BigInteger;
@@ -163,8 +166,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	 * @param login
 	 *            String The login of the user
 	 * @return SSO token to use in cross site parameters.
-	 * @throws NoSuchAlgorithmException
-	 *             When configured digest is not available.
+	 * @throws GeneralSecurityException When configured digest is not available.
 	 */
 	public String getSsoToken(final String login) throws GeneralSecurityException {
 		final String userKey = getUserKey(login);
