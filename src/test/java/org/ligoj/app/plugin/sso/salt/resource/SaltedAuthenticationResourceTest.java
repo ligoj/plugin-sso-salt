@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -44,11 +44,11 @@ class SaltedAuthenticationResourceTest extends AbstractAppTest {
 	@BeforeEach
 	void prepareData() throws IOException {
 		// Only with Spring context
-		persistEntities("csv", new Class[] { SystemConfiguration.class }, StandardCharsets.UTF_8.name());
+		persistEntities("csv", new Class[]{SystemConfiguration.class}, StandardCharsets.UTF_8);
 
 		resource = new SaltedAuthenticationResource();
 		applicationContext.getAutowireCapableBeanFactory().autowireBean(resource);
-		resource.iamProvider = new IamProvider[] { Mockito.mock(IamProvider.class) };
+		resource.iamProvider = new IamProvider[]{Mockito.mock(IamProvider.class)};
 		final IamConfiguration configuration = Mockito.mock(IamConfiguration.class);
 		Mockito.when(resource.iamProvider[0].getConfiguration()).thenReturn(configuration);
 		userRepository = Mockito.mock(IUserRepository.class);
@@ -72,9 +72,7 @@ class SaltedAuthenticationResourceTest extends AbstractAppTest {
 	@Test
 	void testCheckEmptyToken() throws Exception {
 		Assertions.assertNull(resource.checkSsoToken(null));
-		Assertions.assertThrows(AccessDeniedException.class, () -> {
-			Assertions.assertNull(resource.checkSsoToken(""));
-		});
+		Assertions.assertThrows(AccessDeniedException.class, () -> Assertions.assertNull(resource.checkSsoToken("")));
 	}
 
 	@Test
@@ -87,35 +85,27 @@ class SaltedAuthenticationResourceTest extends AbstractAppTest {
 	void checkSsoTokenPasswordChanged() throws GeneralSecurityException {
 		Mockito.when(userRepository.getToken("hdurant")).thenReturn("old-pwd", "new-pwd");
 		final String token = resource.getSsoToken("hdurant");
-		Assertions.assertThrows(AccessDeniedException.class, () -> {
-			resource.checkSsoToken(token);
-		});
+		Assertions.assertThrows(AccessDeniedException.class, () -> resource.checkSsoToken(token));
 	}
 
 	@Test
 	void checkSsoTokenTooOldToken() throws GeneralSecurityException {
 		Mockito.when(userRepository.getToken("mmartin")).thenReturn("pwd");
 		final String token = getOldSsoToken("mmartin", "pwd");
-		Assertions.assertThrows(AccessDeniedException.class, () -> {
-			resource.checkSsoToken(token);
-		});
+		Assertions.assertThrows(AccessDeniedException.class, () -> resource.checkSsoToken(token));
 	}
 
 	@Test
 	void testNotExist() {
 		Mockito.when(userRepository.getToken("jdoe4")).thenReturn(null);
-		Assertions.assertThrows(AccessDeniedException.class, () -> {
-			resource.checkSsoToken(null);
-		});
+		Assertions.assertThrows(AccessDeniedException.class, () -> resource.checkSsoToken(null));
 	}
 
 	/**
 	 * Return SSO token to use in cross site parameters valid for 30 minutes.
 	 *
-	 * @param login
-	 *            The login of the user
-	 * @param userKey
-	 *            The key of the user
+	 * @param login   The login of the user
+	 * @param userKey The key of the user
 	 * @return SSO token to use as cross site parameter.
 	 */
 	private String getOldSsoToken(final String login, final String userKey) throws GeneralSecurityException {

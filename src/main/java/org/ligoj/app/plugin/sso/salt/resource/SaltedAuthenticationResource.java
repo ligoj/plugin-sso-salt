@@ -14,11 +14,12 @@ import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import javax.transaction.Transactional;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
@@ -36,7 +37,7 @@ import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Manage SSO token for VigiReport.
+ * Manage SSO token for external simple applications.
  */
 @Slf4j
 @Path("/security/sso")
@@ -75,18 +76,16 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	 * Authenticates the user with a given login and password If password and/or login is null then always returns
 	 * false. If the user does not exist in the database returns false.
 	 *
-	 * @param token
-	 *            SSO token to validate.
-	 * @return the associated trusted user name or null.
-	 * @throws GeneralSecurityException
-	 *             When configured digest is not available.
+	 * @param token SSO token to validate.
+	 * @return the associated trusted username or null.
+	 * @throws GeneralSecurityException When configured digest is not available.
 	 */
 	@POST
 	public String checkSsoToken(final String token) throws GeneralSecurityException {
 		String[] fields = ArrayUtils.EMPTY_STRING_ARRAY;
 		boolean userExist = true;
 
-		// Secret key of DES algorithm used to generated the SSO token.
+		// Secret key of DES algorithm used to generate the SSO token.
 		final String ssoKey = get("sso.secret", "secret");
 		try {
 			fields = StringUtils.split(StringUtils.trimToEmpty(decrypt(token, ssoKey)), "|");
@@ -97,7 +96,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 		if (fields.length != 4) {
 			// TIME RESISTANT ATTACK
 			userExist = false;
-			fields = new String[] { "0", "000000000000000000000000000=", "00000000000=", "0" };
+			fields = new String[]{"0", "000000000000000000000000000=", "00000000000=", "0"};
 		}
 		final String login = fields[0];
 		final String digest = fields[1];
@@ -130,10 +129,8 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	/**
 	 * Return the configuration integer value.
 	 *
-	 * @param key
-	 *            The configuration key name.
-	 * @param defaultValue
-	 *            The default integer value when <code>null</code>
+	 * @param key          The configuration key name.
+	 * @param defaultValue The default integer value when <code>null</code>
 	 * @return the configuration integer value or the default value.
 	 */
 	private int get(final String key, final int defaultValue) {
@@ -143,10 +140,8 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	/**
 	 * Return the configuration integer value.
 	 *
-	 * @param key
-	 *            The configuration key name.
-	 * @param defaultValue
-	 *            The default integer value when <code>null</code>
+	 * @param key          The configuration key name.
+	 * @param defaultValue The default integer value when <code>null</code>
 	 * @return the configuration integer value or the default value.
 	 */
 	private String get(final String key, final String defaultValue) {
@@ -163,8 +158,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	/**
 	 * Return SSO token to use in cross site parameters valid for 30 minutes.
 	 *
-	 * @param login
-	 *            String The login of the user
+	 * @param login String The login of the user
 	 * @return SSO token to use in cross site parameters.
 	 * @throws GeneralSecurityException When configured digest is not available.
 	 */
@@ -179,13 +173,10 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	/**
 	 * Return SSO token to use in cross site parameters valid for few minutes.
 	 *
-	 * @param login
-	 *            The login of the user.
-	 * @param userKey
-	 *            The key of the user.
+	 * @param login   The login of the user.
+	 * @param userKey The key of the user.
 	 * @return SSO token to use as cross site parameter.
-	 * @throws GeneralSecurityException
-	 *             When digest failed.
+	 * @throws GeneralSecurityException When digest failed.
 	 */
 	private String getSsoToken(final String login, final String userKey) throws GeneralSecurityException {
 		// Uses a secure Random not a simple Random
@@ -199,24 +190,21 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 		final byte[] bDigest = getHash(get("sso.iteration", 1000), login + userKey + expire, bSalt);
 		final String sDigest = byteToBase64(bDigest);
 		final String sSalt = byteToBase64(bSalt);
-		// Secret key of DES algorithm used to generated the SSO token.
+		// Secret key of DES algorithm used to generate the SSO token.
 		final String ssoKey = configuration.get("sso.secret");
 		// Generated an encrypted key, valid for 30 minutes
 		return encrypt(login + "|" + sDigest + "|" + sSalt + "|"
-				+ new String(Base64.encodeInteger(new BigInteger(String.valueOf(expire))), StandardCharsets.UTF_8),
+						+ new String(Base64.encodeInteger(new BigInteger(String.valueOf(expire))), StandardCharsets.UTF_8),
 				ssoKey);
 	}
 
 	/**
 	 * Encrypt the message with the given key.
 	 *
-	 * @param message
-	 *            Ciphered message.
-	 * @param secretKey
-	 *            The secret key.
+	 * @param message   Ciphered message.
+	 * @param secretKey The secret key.
 	 * @return the original message.
-	 * @throws GeneralSecurityException
-	 *             When encryption can not be performed.
+	 * @throws GeneralSecurityException When encryption can not be performed.
 	 */
 	protected String encrypt(final String message, final String secretKey) throws GeneralSecurityException {
 		// SSO digest algorithm used for password. This
@@ -239,10 +227,8 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	/**
 	 * Decrypt the message with the given key.
 	 *
-	 * @param encryptedMessage
-	 *            Encrypted message.
-	 * @param secretKey
-	 *            The secret key.
+	 * @param encryptedMessage Encrypted message.
+	 * @param secretKey        The secret key.
 	 * @return the original message.
 	 */
 	private String decrypt(final String encryptedMessage, final String secretKey) throws Exception { // NOSONAR
@@ -261,15 +247,11 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	/**
 	 * From a password, a number of iterations and a salt, returns the corresponding digest
 	 *
-	 * @param iterations
-	 *            The amount of iterations of the algorithm.
-	 * @param password
-	 *            String The password to encrypt
-	 * @param salt
-	 *            byte[] The salt
+	 * @param iterations The amount of iterations of the algorithm.
+	 * @param password   String The password to encrypt
+	 * @param salt       byte[] The salt
 	 * @return byte[] The digested password
-	 * @throws NoSuchAlgorithmException
-	 *             If the algorithm doesn't exist
+	 * @throws NoSuchAlgorithmException If the algorithm doesn't exist
 	 */
 	protected byte[] getHash(final int iterations, final String password, final byte[] salt)
 			throws NoSuchAlgorithmException {
@@ -287,8 +269,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	/**
 	 * From a base 64 representation, returns the corresponding byte[]
 	 *
-	 * @param data
-	 *            String The base64 representation
+	 * @param data String The base64 representation
 	 * @return byte[]
 	 */
 	protected byte[] base64ToByte(final String data) {
@@ -298,8 +279,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	/**
 	 * From a byte[] returns a base 64 representation
 	 *
-	 * @param data
-	 *            byte[]
+	 * @param data byte[]
 	 * @return String
 	 */
 	protected String byteToBase64(final byte[] data) {
