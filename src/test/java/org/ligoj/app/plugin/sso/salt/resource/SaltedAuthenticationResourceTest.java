@@ -44,7 +44,7 @@ class SaltedAuthenticationResourceTest extends AbstractAppTest {
 	@BeforeEach
 	void prepareData() throws IOException {
 		// Only with Spring context
-		persistEntities("csv", new Class[]{SystemConfiguration.class}, StandardCharsets.UTF_8);
+		persistEntities("csv", new Class<?>[]{SystemConfiguration.class}, StandardCharsets.UTF_8);
 
 		resource = new SaltedAuthenticationResource();
 		applicationContext.getAutowireCapableBeanFactory().autowireBean(resource);
