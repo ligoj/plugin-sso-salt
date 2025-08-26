@@ -145,7 +145,7 @@ public class SaltedAuthenticationResource implements FeaturePlugin {
 	 * @return the configuration integer value or the default value.
 	 */
 	private String get(final String key, final String defaultValue) {
-		return ObjectUtils.defaultIfNull(configuration.get(key), defaultValue);
+		return ObjectUtils.getIfNull(configuration.get(key), defaultValue);
 	}
 
 	/**
