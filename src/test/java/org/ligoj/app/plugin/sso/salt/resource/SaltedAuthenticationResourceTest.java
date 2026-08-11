@@ -3,14 +3,7 @@
  */
 package org.ligoj.app.plugin.sso.salt.resource;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
-import java.security.SecureRandom;
-
 import jakarta.transaction.Transactional;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -23,11 +16,19 @@ import org.ligoj.app.iam.IUserRepository;
 import org.ligoj.app.iam.IamConfiguration;
 import org.ligoj.app.iam.IamProvider;
 import org.ligoj.bootstrap.model.system.SystemConfiguration;
-import org.mockito.Mockito;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test class of {@link SaltedAuthenticationResource}
@@ -48,23 +49,23 @@ class SaltedAuthenticationResourceTest extends AbstractAppTest {
 
 		resource = new SaltedAuthenticationResource();
 		applicationContext.getAutowireCapableBeanFactory().autowireBean(resource);
-		resource.iamProvider = new IamProvider[]{Mockito.mock(IamProvider.class)};
-		final IamConfiguration configuration = Mockito.mock(IamConfiguration.class);
-		Mockito.when(resource.iamProvider[0].getConfiguration()).thenReturn(configuration);
-		userRepository = Mockito.mock(IUserRepository.class);
-		Mockito.when(configuration.getUserRepository()).thenReturn(userRepository);
+		resource.iamProvider = new IamProvider[]{mock(IamProvider.class)};
+		final IamConfiguration configuration = mock(IamConfiguration.class);
+		when(resource.iamProvider[0].getConfiguration()).thenReturn(configuration);
+		userRepository = mock(IUserRepository.class);
+		when(configuration.getUserRepository()).thenReturn(userRepository);
 	}
 
 	@Test
 	void testGetToken() throws GeneralSecurityException {
-		Mockito.when(userRepository.getToken("jdupont")).thenReturn("pwd");
+		when(userRepository.getToken("jdupont")).thenReturn("pwd");
 		Assertions.assertNotNull(StringUtils.trimToNull(resource.getSsoToken("jdupont")));
 	}
 
 	@Test
 	void testGetTokenFromUser() throws GeneralSecurityException {
-		Mockito.when(userRepository.getToken("any")).thenReturn(null);
-		Mockito.when(userRepository.getToken(null)).thenReturn(null);
+		when(userRepository.getToken("any")).thenReturn(null);
+		when(userRepository.getToken(null)).thenReturn(null);
 		Assertions.assertNull(resource.getSsoToken("any"));
 		Assertions.assertNull(resource.getSsoToken(null));
 	}
@@ -77,27 +78,27 @@ class SaltedAuthenticationResourceTest extends AbstractAppTest {
 
 	@Test
 	void testValidToken() throws GeneralSecurityException {
-		Mockito.when(userRepository.getToken("jdupont")).thenReturn("pwd");
+		when(userRepository.getToken("jdupont")).thenReturn("pwd");
 		Assertions.assertEquals("jdupont", resource.checkSsoToken(resource.getSsoToken("jdupont")));
 	}
 
 	@Test
 	void checkSsoTokenPasswordChanged() throws GeneralSecurityException {
-		Mockito.when(userRepository.getToken("hdurant")).thenReturn("old-pwd", "new-pwd");
+		when(userRepository.getToken("hdurant")).thenReturn("old-pwd", "new-pwd");
 		final String token = resource.getSsoToken("hdurant");
 		Assertions.assertThrows(AccessDeniedException.class, () -> resource.checkSsoToken(token));
 	}
 
 	@Test
 	void checkSsoTokenTooOldToken() throws GeneralSecurityException {
-		Mockito.when(userRepository.getToken("mmartin")).thenReturn("pwd");
+		when(userRepository.getToken("mmartin")).thenReturn("pwd");
 		final String token = getOldSsoToken("mmartin", "pwd");
 		Assertions.assertThrows(AccessDeniedException.class, () -> resource.checkSsoToken(token));
 	}
 
 	@Test
 	void testNotExist() {
-		Mockito.when(userRepository.getToken("jdoe4")).thenReturn(null);
+		when(userRepository.getToken("jdoe4")).thenReturn(null);
 		Assertions.assertThrows(AccessDeniedException.class, () -> resource.checkSsoToken(null));
 	}
 
